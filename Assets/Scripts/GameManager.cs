@@ -1,45 +1,95 @@
 using System.Collections.Generic;
-using System.Numerics;
 using UnityEngine;
+using UnityEngine.Events;
+
+public enum GameState{
+    PlayerTurn,
+    Busy,
+    Animation
+}
 
 public class GameManager : MonoBehaviour
 {
     private Dictionary<Vector3Int, CustomTile> rustTiles = new Dictionary<Vector3Int, CustomTile>();
-    private TileManager tileManager;
 
-    private float maxTime = 2.5f;
-    private float currentTime;
+    // private float maxTime = 2.5f;
+    // private float currentTime;
+
+    public UnityEvent<List<Vector3Int>> OnPlayerTurnEnded;
+
+    private static GameManager instance;
+    public static GameManager Instance
+    {
+        get
+        {
+            return instance;
+        }
+    }
+
+    private GameState state = GameState.PlayerTurn;
+    public GameState State
+    {
+        get
+        {
+            return state;
+        }
+    }
 
     private void Awake()
     {
-        tileManager = FindObjectOfType<TileManager>();
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void Start()
     {
-        currentTime = 0;
+        state = GameState.PlayerTurn;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        currentTime += Time.fixedDeltaTime;
-
-        if(currentTime >= maxTime)
+        switch (state)
         {
-            currentTime = 0;
-            ChangeTurn();
+            case GameState.PlayerTurn:
+                //player turn logic
+                //currently state is changed in TileManager
+                break;
+            case GameState.Busy:
+                OnPlayerTurnEnded.Invoke(new List<Vector3Int>(rustTiles.Keys));
+                //busy logic
+                Debug.Log("Busy state");
+
+                state = GameState.Animation;
+                break;
+            case GameState.Animation:
+                //animation logic
+                Debug.Log("Animation state");
+                state = GameState.PlayerTurn;
+                break;
         }
     }
 
-    private void ChangeTurn()
+    public void UpdateState(GameState newState)
     {
-        List<Vector3Int> currentRustTiles = new List<Vector3Int>(rustTiles.Keys); 
-
-        foreach (Vector3Int tilePos in currentRustTiles) 
-        {
-            tileManager.ChceskNeighbor(tilePos);
-        }
+        state = newState;
     }
+
+    // private void FixedUpdate()
+    // {
+    //     currentTime += Time.fixedDeltaTime;
+
+    //     if(currentTime >= maxTime)
+    //     {
+    //         currentTime = 0;
+    //         // ChangeTurn();
+    //     }
+    // }
 
     public void AddToRustList(Vector3Int pos, CustomTile tile)
     {
