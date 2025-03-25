@@ -47,8 +47,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tilemap: {fileID: 0}
   overlayTilemap: {fileID: 0}
-  rustSprite: {fileID: 21300000, guid: 89a7b18cb2ca4be42beb21d75dfe1195, type: 3}
+  RustSprite: {fileID: 21300000, guid: 89a7b18cb2ca4be42beb21d75dfe1195, type: 3}
   DebugSprite: {fileID: 21300000, guid: af311530b7eedce4fa6a9c8cea68e95a, type: 3}
+  EnemySprite: {fileID: 21300000, guid: a489008f6f27e5341a34ef8af5807550, type: 3}
   startRustTilePos: {x: 6, y: 3, z: 0}
 --- !u!114 &9124017257594236300
 MonoBehaviour:
