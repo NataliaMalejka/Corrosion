@@ -6,6 +6,8 @@ using UnityEngine.XR;
 public enum GameState{
     PlayerTurn,
     Busy,
+    EnemyMoving,
+    TileUpdate,
     Animation
 }
 
@@ -20,6 +22,9 @@ public class GameManager : MonoBehaviour
 
     public UnityEvent<HashSet<Vector3Int>, HashSet<Vector3Int>> OnPlayerTurnEnded;
     public UnityEvent<HashSet<Vector3Int>> OnEnemyTurnEnded;
+
+    private int movingEnemyCount = 0;
+    HashSet<Vector3Int> enemyPositions = new HashSet<Vector3Int>();
 
     private static GameManager instance;
     public static GameManager Instance
@@ -65,16 +70,22 @@ public class GameManager : MonoBehaviour
                 //currently state is changed in TileManager on click
                 break;
             case GameState.Busy:
-                Debug.Log("Busy state");
-
                 //currently - enemy moves, enemy cleans, rust spreads
                 //more aggressive enemies - enemy cleans, enemy moves, rust spreads
                 //rust overwhelms enemy -  rust spreads, enemy moves, enemy cleans
-                HashSet<Vector3Int> enemyPositions = HandleEnemyMove();
-                // Additional state can be added here to wait for enemy movement animation to finish if introduced
-                // eq: each enemy moves to target tile: transform.position = Vector3.MoveTowards(transform.position, targetTile, speed * Time.deltaTime);
+                movingEnemyCount = Enemies.Count;
+                enemyPositions = HandleEnemyMove();
+                state = GameState.EnemyMoving;
+                break;
+            case GameState.EnemyMoving:
+                //wait for enemy movement to finish
+                if (movingEnemyCount == 0)
+                {
+                    state = GameState.TileUpdate;
+                }
+                break;
+            case GameState.TileUpdate:
                 OnEnemyTurnEnded.Invoke(enemyPositions);
-
                 OnPlayerTurnEnded.Invoke(new HashSet<Vector3Int>(rustTiles.Keys), enemyPositions);
 
                 state = GameState.Animation;
@@ -85,6 +96,11 @@ public class GameManager : MonoBehaviour
                 state = GameState.PlayerTurn;
                 break;
         }
+    }
+
+    public void OnEnemyFinishMoving()
+    {
+        movingEnemyCount--;
     }
 
     private HashSet<Vector3Int> HandleEnemyMove()

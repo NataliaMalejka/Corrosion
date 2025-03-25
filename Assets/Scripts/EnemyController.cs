@@ -1,11 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
 public class EnemyController : MonoBehaviour
 {
     public Vector3Int Position { get; private set; }
     private Vector2 boxSize = new Vector2(0.8f, 0.8f);
     [SerializeField] private LayerMask collisionLayer; 
+    [SerializeField] private float moveSpeed = 3.0f;
     private void Start()
     {
         Position = TileManager.Instance.FloorTilemap.WorldToCell(transform.position);
@@ -32,7 +34,7 @@ public class EnemyController : MonoBehaviour
                 && Physics2D.OverlapBox(TileManager.Instance.FloorTilemap.CellToWorld(step), boxSize, 0, collisionLayer) == null)
             {                
                 Position = step;
-                transform.position = TileManager.Instance.FloorTilemap.CellToWorld(Position);
+                StartCoroutine(SmoothMove(TileManager.Instance.FloorTilemap.CellToWorld(Position)));
                 break;
             }
         }
@@ -63,5 +65,19 @@ public class EnemyController : MonoBehaviour
             }
         }
         return closestTile;
+    }
+
+    IEnumerator SmoothMove(Vector3 targetWorldPos)
+    {
+        Vector3 startPos = transform.position;
+        float distance = Vector3.Distance(startPos, targetWorldPos);
+
+        while (Vector3.Distance(transform.position, targetWorldPos) > 0.01f)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, targetWorldPos, moveSpeed * Time.deltaTime);
+            yield return null;
+        }
+        transform.position = targetWorldPos;
+        GameManager.Instance.OnEnemyFinishMoving();
     }
 }
