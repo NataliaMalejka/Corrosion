@@ -6,8 +6,10 @@ public class EnemyController : MonoBehaviour
 {
     public Vector3Int Position { get; private set; }
     private Vector2 boxSize = new Vector2(0.8f, 0.8f);
-    [SerializeField] private LayerMask collisionLayer; 
-    [SerializeField] private float moveSpeed = 3.0f;
+    [SerializeField] private LayerMask CollisionLayer; 
+    [SerializeField] private float MoveSpeed = 3.0f;
+    [SerializeField] private SpriteRenderer SpriteRenderer;
+    [SerializeField] private Animator Animator;
     private void Start()
     {
         Position = TileManager.Instance.FloorTilemap.WorldToCell(transform.position);
@@ -32,8 +34,13 @@ public class EnemyController : MonoBehaviour
 
             if (TileManager.Instance.FloorTilemap.HasTile(step) 
                 && !rustPositions.Contains(step)
-                && Physics2D.OverlapBox(TileManager.Instance.FloorTilemap.CellToWorld(step), boxSize, 0, collisionLayer) == null)
+                && Physics2D.OverlapBox(TileManager.Instance.FloorTilemap.CellToWorld(step), boxSize, 0, CollisionLayer) == null)
             {                
+                if(step.x - Position.x == -1)
+                { SpriteRenderer.flipX = true; }
+                else if (step.x - Position.x == 1)
+                { SpriteRenderer.flipX = false; }
+
                 Position = step;
                 hasToMove = true;
                 StartCoroutine(SmoothMove(TileManager.Instance.FloorTilemap.CellToWorld(Position)));
@@ -72,12 +79,14 @@ public class EnemyController : MonoBehaviour
 
     IEnumerator SmoothMove(Vector3 targetWorldPos)
     {
+        Animator.SetBool("move", true);
         while (Vector3.Distance(transform.position, targetWorldPos) > 0.01f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetWorldPos, moveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, targetWorldPos, MoveSpeed * Time.deltaTime);
             yield return null;
         }
         transform.position = targetWorldPos;
+        Animator.SetBool("move", false);
         GameManager.Instance.OnEnemyFinishMoving();
     }
 }

@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject enemyPrefab; 
     [SerializeField] private int maxTurns = 20; 
     [SerializeField] private GameObject EndScreenPrefab; 
+    [SerializeField] private UiController UiController; 
 
 
     public UnityEvent<HashSet<Vector3Int>, HashSet<Vector3Int>> OnPlayerTurnEnded;
@@ -64,6 +65,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         state = GameState.PlayerTurn;
+        UiController.UpdateTurnCounter(maxTurns);
     }
 
     private void Update()
@@ -97,6 +99,7 @@ public class GameManager : MonoBehaviour
             case GameState.Animation:
                 //animation and other logic if needed
                 turnCount++;
+                UiController.UpdateTurnCounter(maxTurns - turnCount);
                 if (turnCount >= maxTurns || rustTiles.Count == 0)
                 {
                     UpdateState(GameState.GameEnd);
@@ -108,7 +111,7 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.GameEnd:
                 GameObject endScreenInstance = Instantiate(EndScreenPrefab);
-                endScreenInstance.GetComponent<GameEndController>().EndGame(turnCount < maxTurns && rustTiles.Count != 0);
+                endScreenInstance.GetComponent<GameEndController>().EndGame(turnCount < maxTurns && rustTiles.Count != 0, rustTiles.Count == 0);
                 state = GameState.IdleBrokenLoop;
                 break;
             case GameState.IdleBrokenLoop:
