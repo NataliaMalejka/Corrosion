@@ -109,7 +109,7 @@ public class TileManager : MonoBehaviour
             overlayTile.sprite = DebugSprite;
             overlayTilemap.SetTile(clickPos, overlayTile);
         }
-        GameManager.Instance.UpdateState(GameState.Busy);
+        //GameManager.Instance.UpdateState(GameState.Busy);
         GetComponent<PlayerInput>().ActivateInput();
     }
 
