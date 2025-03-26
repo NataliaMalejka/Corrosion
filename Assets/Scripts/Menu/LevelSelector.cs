@@ -27,4 +27,10 @@ public class LevelSelector : MonoBehaviour
         }
         panels[currentPanelIdx].SetActive(true);
     }
+
+    public void ExitGame()
+    {
+        Debug.Log("Quitting game");
+        Application.Quit();
+    }
 }

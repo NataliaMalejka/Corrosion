@@ -13,15 +13,16 @@ public class EnemyController : MonoBehaviour
         Position = TileManager.Instance.FloorTilemap.WorldToCell(transform.position);
     }
 
-    public void OnItsTurn(HashSet<Vector3Int> rustPositions)
+    public bool OnItsTurn(HashSet<Vector3Int> rustPositions)
     {
-        MoveTowardInfestation(rustPositions);
+        return MoveTowardInfestation(rustPositions);
     }
 
-    private void MoveTowardInfestation(HashSet<Vector3Int> rustPositions)
+    private bool MoveTowardInfestation(HashSet<Vector3Int> rustPositions)
     {
+        bool hasToMove = false;
         Vector3Int targetTile = GetClosestInfestedTile(rustPositions);
-        if (targetTile == Position) return;
+        if (targetTile == Position) return hasToMove;
         List<Vector3Int> nextSteps = GetNextGradedStepTowards(targetTile);
         foreach (var step in nextSteps)
         {
@@ -34,10 +35,12 @@ public class EnemyController : MonoBehaviour
                 && Physics2D.OverlapBox(TileManager.Instance.FloorTilemap.CellToWorld(step), boxSize, 0, collisionLayer) == null)
             {                
                 Position = step;
+                hasToMove = true;
                 StartCoroutine(SmoothMove(TileManager.Instance.FloorTilemap.CellToWorld(Position)));
                 break;
             }
         }
+        return hasToMove;
     }
 
     private List<Vector3Int> GetNextGradedStepTowards(Vector3Int target)
@@ -69,9 +72,6 @@ public class EnemyController : MonoBehaviour
 
     IEnumerator SmoothMove(Vector3 targetWorldPos)
     {
-        Vector3 startPos = transform.position;
-        float distance = Vector3.Distance(startPos, targetWorldPos);
-
         while (Vector3.Distance(transform.position, targetWorldPos) > 0.01f)
         {
             transform.position = Vector3.MoveTowards(transform.position, targetWorldPos, moveSpeed * Time.deltaTime);

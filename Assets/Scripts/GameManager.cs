@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.XR;
 
 public enum GameState{
     PlayerTurn,
     Busy,
     EnemyMoving,
     TileUpdate,
-    Animation
+    Animation,
+    GameEnd,
+    IdleBrokenLoop
 }
 
 public class GameManager : MonoBehaviour
@@ -19,11 +20,15 @@ public class GameManager : MonoBehaviour
     public HashSet<GameObject> Enemies = new HashSet<GameObject>();
 
     [SerializeField] private GameObject enemyPrefab; 
+    [SerializeField] private int maxTurns = 20; 
+    [SerializeField] private GameObject EndScreenPrefab; 
+
 
     public UnityEvent<HashSet<Vector3Int>, HashSet<Vector3Int>> OnPlayerTurnEnded;
     public UnityEvent<HashSet<Vector3Int>> OnEnemyTurnEnded;
 
     private int movingEnemyCount = 0;
+    private int turnCount = 0;
     HashSet<Vector3Int> enemyPositions = new HashSet<Vector3Int>();
 
     private static GameManager instance;
@@ -73,27 +78,41 @@ public class GameManager : MonoBehaviour
                 //currently - enemy moves, enemy cleans, rust spreads
                 //more aggressive enemies - enemy cleans, enemy moves, rust spreads
                 //rust overwhelms enemy -  rust spreads, enemy moves, enemy cleans
-                movingEnemyCount = Enemies.Count;
                 enemyPositions = HandleEnemyMove();
-                state = GameState.EnemyMoving;
+                UpdateState(GameState.EnemyMoving);
                 break;
             case GameState.EnemyMoving:
                 //wait for enemy movement to finish
                 if (movingEnemyCount == 0)
                 {
-                    state = GameState.TileUpdate;
+                    UpdateState(GameState.TileUpdate);
                 }
                 break;
             case GameState.TileUpdate:
                 OnEnemyTurnEnded.Invoke(enemyPositions);
                 OnPlayerTurnEnded.Invoke(new HashSet<Vector3Int>(rustTiles.Keys), enemyPositions);
 
-                state = GameState.Animation;
+                UpdateState(GameState.Animation);
                 break;
             case GameState.Animation:
                 //animation and other logic if needed
-                Debug.Log("Animation state");
-                state = GameState.PlayerTurn;
+                turnCount++;
+                if (turnCount >= maxTurns || rustTiles.Count == 0)
+                {
+                    UpdateState(GameState.GameEnd);
+                }
+                else
+                {
+                    UpdateState(GameState.PlayerTurn);
+                }
+                break;
+            case GameState.GameEnd:
+                GameObject endScreenInstance = Instantiate(EndScreenPrefab);
+                endScreenInstance.GetComponent<GameEndController>().EndGame(turnCount < maxTurns && rustTiles.Count != 0);
+                state = GameState.IdleBrokenLoop;
+                break;
+            case GameState.IdleBrokenLoop:
+                //idle state, when logic must end permanently
                 break;
         }
     }
@@ -109,7 +128,7 @@ public class GameManager : MonoBehaviour
         foreach (var enemy in Enemies)
         {
             EnemyController enemyController = enemy.GetComponent<EnemyController>();
-            enemyController.OnItsTurn(new HashSet<Vector3Int>(rustTiles.Keys));
+            movingEnemyCount += enemyController.OnItsTurn(new HashSet<Vector3Int>(rustTiles.Keys)) ? 1 : 0;
             enemyPositions.Add(enemyController.Position);
         }
         return enemyPositions;
@@ -117,7 +136,10 @@ public class GameManager : MonoBehaviour
 
     public void UpdateState(GameState newState)
     {
-        state = newState;
+        if (State != GameState.GameEnd && State != GameState.IdleBrokenLoop)
+        {
+            state = newState;
+        }
     }
 
     public void AddToRustList(Vector3Int pos, CustomTile tile)

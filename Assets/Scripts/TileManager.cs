@@ -13,6 +13,7 @@ public class TileManager : MonoBehaviour
     [SerializeField] private Vector3Int startRustTilePos;
     [SerializeField] private LayerMask collisionLayer;
     [SerializeField] private float distance;
+    private Vector3Int finalTilePos;
 
     private static TileManager instance;
     public static TileManager Instance
@@ -80,6 +81,10 @@ public class TileManager : MonoBehaviour
                 {
                     GameManager.Instance.SpawnEnemy(pos);
                 }
+                else if (tile.cellType == CellType.Finish)
+                {
+                    finalTilePos = pos;
+                }
             }
         }
 
@@ -139,6 +144,10 @@ public class TileManager : MonoBehaviour
                 && !enemyPositions.Contains(neighborPos) && !hit)
             {
                 ChangeTile(neighborPos, neighborTile);
+                if (finalTilePos == neighborPos)
+                {
+                    GameManager.Instance.UpdateState(GameState.GameEnd);
+                }
             }
         }
     }
