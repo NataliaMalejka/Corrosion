@@ -11,6 +11,8 @@ public class TileManager : MonoBehaviour
     [SerializeField] private Sprite RustSprite;
     [SerializeField] private Sprite DebugSprite;
     [SerializeField] private Vector3Int startRustTilePos;
+    [SerializeField] private LayerMask collisionLayer;
+    [SerializeField] private float distance;
 
     private static TileManager instance;
     public static TileManager Instance
@@ -127,8 +129,14 @@ public class TileManager : MonoBehaviour
             Vector3Int neighborPos = pos + direction;
             CustomTile neighborTile = FloorTilemap.GetTile<CustomTile>(neighborPos);
 
+            Vector3 startpos = pos + new Vector3(0.5f, 0.5f, 0);
+            Vector3 dir = direction;
+            bool hit = Physics.Raycast(startpos, dir, out RaycastHit hitInfo, distance, collisionLayer);
+
+            Debug.DrawRay(startpos, dir * distance, hit ? Color.red : Color.green, 2f);
+
             if (neighborTile != null && neighborTile.occupancy.Equals(CellState.Empty)
-                && !enemyPositions.Contains(neighborPos))
+                && !enemyPositions.Contains(neighborPos) && !hit)
             {
                 ChangeTile(neighborPos, neighborTile);
             }
