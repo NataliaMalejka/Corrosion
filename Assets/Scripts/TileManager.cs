@@ -97,6 +97,7 @@ public class TileManager : MonoBehaviour
     {
         if (GameManager.Instance.State != GameState.PlayerTurn || !context.performed)
             return;
+        return;
         GetComponent<PlayerInput>().DeactivateInput();
         
         Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
@@ -114,7 +115,7 @@ public class TileManager : MonoBehaviour
             overlayTile.sprite = DebugSprite;
             overlayTilemap.SetTile(clickPos, overlayTile);
         }
-        GameManager.Instance.UpdateState(GameState.Busy);
+        //GameManager.Instance.UpdateState(GameState.Busy);
         GetComponent<PlayerInput>().ActivateInput();
     }
 
@@ -158,8 +159,12 @@ public class TileManager : MonoBehaviour
         foreach (Vector3Int direction in directions)
         {
             Vector3Int neighborPos = pos + direction;
+            Vector3 dir = direction;
+            bool wallHit = Physics.Raycast(pos + new Vector3(0.5f, 0.5f, 0), dir, out RaycastHit hitInfo, distance, collisionLayer);
             CustomTile neighborTile = FloorTilemap.GetTile<CustomTile>(neighborPos);
-            if (neighborTile != null && GameManager.Instance.CheckIfTileHasRust(neighborPos))
+            if (neighborTile != null 
+                && GameManager.Instance.CheckIfTileHasRust(neighborPos)
+                && !wallHit)
             {
                 overlayTilemap.SetTile(neighborPos, null);
                 GameManager.Instance.RemoveFromRustList(neighborPos);
