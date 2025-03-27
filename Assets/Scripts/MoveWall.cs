@@ -1,19 +1,21 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-
+using System.Collections;
 public class MoveWall : MonoBehaviour
 {
     private Animator animator;
+    [SerializeField] AnimationEventBroadcaster animationEventBroadcaster;
 
     private void Start()
     {
         animator = GetComponentInParent<Animator>();
         animator.SetFloat("Speed", 1);
+        animationEventBroadcaster.OnAnimationEndEvent.AddListener(OnAnimationEnded);
     }
 
     public void OnClick(InputAction.CallbackContext context)
     {
-        Debug.Log("click");
+        // Debug.Log("click");
 
         if (GameManager.Instance.State != GameState.PlayerTurn || !context.performed)
             return;
@@ -34,17 +36,25 @@ public class MoveWall : MonoBehaviour
                 }
             }
         }
-
         GetComponent<PlayerInput>().ActivateInput();
     }
 
     public void TriggerAnimation()
     {
-        Debug.Log("animacja");
+        // Debug.Log("animacja");
 
         if (animator != null)
         {
             animator.SetTrigger("Click");
+        }
+    }
+
+    public void OnAnimationEnded()
+    {
+        if(GameManager.Instance.State == GameState.PlayerTurn)
+        {
+            GetComponent<PlayerInput>().ActivateInput();
+            GameManager.Instance.UpdateState(GameState.Busy);
         }
     }
 }

@@ -48,7 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CollisionLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 9
   MoveSpeed: 3
   SpriteRenderer: {fileID: 2385237032048571788}
   Animator: {fileID: 4678523412953456059}

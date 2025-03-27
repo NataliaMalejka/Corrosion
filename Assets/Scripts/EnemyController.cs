@@ -7,6 +7,7 @@ public class EnemyController : MonoBehaviour
     public Vector3Int Position { get; private set; }
     private Vector2 boxSize = new Vector2(0.8f, 0.8f);
     [SerializeField] private LayerMask CollisionLayer; 
+    [SerializeField] private LayerMask EnemyLayer; 
     [SerializeField] private float MoveSpeed = 3.0f;
     [SerializeField] private SpriteRenderer SpriteRenderer;
     [SerializeField] private Animator Animator;
@@ -32,9 +33,12 @@ public class EnemyController : MonoBehaviour
             // Debug.Log("Is tile "+step+" rusted? "+rustPositions.Contains(step));
             // Debug.Log("Is tile "+step+" free? "+ (Physics2D.OverlapBox(TileManager.Instance.FloorTilemap.CellToWorld(step), boxSize, 0, collisionLayer) == null));
 
+            bool wallHit = Physics.Raycast(Position + new Vector3(0.5f, 0.5f, 0), step - Position, out RaycastHit hitInfo, 1, CollisionLayer);
+
             if (TileManager.Instance.FloorTilemap.HasTile(step) 
                 && !rustPositions.Contains(step)
-                && Physics2D.OverlapBox(TileManager.Instance.FloorTilemap.CellToWorld(step), boxSize, 0, CollisionLayer) == null)
+                && Physics2D.OverlapBox(TileManager.Instance.FloorTilemap.CellToWorld(step), boxSize, 0, EnemyLayer) == null
+                && !wallHit)
             {                
                 if(step.x - Position.x == -1)
                 { SpriteRenderer.flipX = true; }
