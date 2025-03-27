@@ -33,6 +33,7 @@ public class GameEndController : MonoBehaviour
             try
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+                SoundsManager.Instance.PlaySounds(Sounds.ButtonClick);
             }
             catch (System.Exception)
             {
@@ -51,6 +52,7 @@ public class GameEndController : MonoBehaviour
         try
         {
             SceneManager.LoadScene(LevelSelectionSceneIndex);
+            SoundsManager.Instance.PlaySounds(Sounds.ButtonClick);
         }
         catch (System.Exception)
         {
