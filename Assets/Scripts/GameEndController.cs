@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine.InputSystem;
 public class GameEndController : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI gameOverText;
@@ -25,6 +26,14 @@ public class GameEndController : MonoBehaviour
             gameOverText.text = lostByElimination ? GameLostMessage : GameLostMessage2;
             nextLevelButtonText.text = "Repeat Level";
         }
+    }
+
+    public void NextTurn()
+    {
+        if (GameManager.Instance.State != GameState.PlayerTurn)
+            return;
+
+        GameManager.Instance.UpdateState(GameState.Busy);
     }
 
     public void NextLevelOrRepeat()

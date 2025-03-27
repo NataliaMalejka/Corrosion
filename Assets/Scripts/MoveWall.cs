@@ -8,13 +8,10 @@ public class MoveWall : MonoBehaviour
     private void Start()
     {
         animator = GetComponentInParent<Animator>();
-        animator.SetFloat("Speed", 1);
     }
 
     public void OnClick(InputAction.CallbackContext context)
     {
-        Debug.Log("click");
-
         if (GameManager.Instance.State != GameState.PlayerTurn || !context.performed)
             return;
 
@@ -40,10 +37,9 @@ public class MoveWall : MonoBehaviour
 
     public void TriggerAnimation()
     {
-        Debug.Log("animacja");
-
         if (animator != null)
         {
+            SoundsManager.Instance.PlaySounds(Sounds.WallMove);
             animator.SetTrigger("Click");
         }
     }
