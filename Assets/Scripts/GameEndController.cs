@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
-using UnityEngine.InputSystem;
 public class GameEndController : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI gameOverText;

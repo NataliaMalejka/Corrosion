@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections;
+
 public class MoveWall : MonoBehaviour
 {
     private Animator animator;
