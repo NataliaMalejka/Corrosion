@@ -65,7 +65,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         state = GameState.PlayerTurn;
-        UiController.UpdateTurnCounter(maxTurns);
+        UiController.UpdateTurnCounter(maxTurns, maxTurns);
     }
 
     private void Update()
@@ -99,7 +99,7 @@ public class GameManager : MonoBehaviour
             case GameState.Animation:
                 //animation and other logic if needed
                 turnCount++;
-                UiController.UpdateTurnCounter(maxTurns - turnCount);
+                UiController.UpdateTurnCounter(maxTurns - turnCount, maxTurns);
                 if (turnCount >= maxTurns || rustTiles.Count == 0)
                 {
                     UpdateState(GameState.GameEnd);

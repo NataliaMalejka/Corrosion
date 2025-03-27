@@ -1,11 +1,14 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class UiController : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI TurnText;
-    public void UpdateTurnCounter(int turns)
+    [SerializeField] Slider Slider;
+    public void UpdateTurnCounter(int turns, int maxTurns)
     {
-        TurnText.text = "Moves left: " + turns.ToString();
+        TurnText.text = turns.ToString() + "/" + maxTurns.ToString();
+        Slider.value = (float)turns/(float)maxTurns;
     }
 }
