@@ -4,7 +4,7 @@ using System.Collections;
 public class MoveWall : MonoBehaviour
 {
     private Animator animator;
-    [SerializeField] AnimationEventBroadcaster animationEventBroadcaster;
+    //[SerializeField] AnimationEventBroadcaster animationEventBroadcaster;
 
     private void Start()
     {
@@ -15,6 +15,8 @@ public class MoveWall : MonoBehaviour
 
     public void OnClick(InputAction.CallbackContext context)
     {
+        Debug.Log("click");
+
         if (GameManager.Instance.State != GameState.PlayerTurn || !context.performed)
             return;
 
@@ -34,6 +36,7 @@ public class MoveWall : MonoBehaviour
                 }
             }
         }
+
         GetComponent<PlayerInput>().ActivateInput();
     }
 
