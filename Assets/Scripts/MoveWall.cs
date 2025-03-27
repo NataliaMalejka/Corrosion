@@ -9,14 +9,12 @@ public class MoveWall : MonoBehaviour
     private void Start()
     {
         animator = GetComponentInParent<Animator>();
-        animator.SetFloat("Speed", 1);
-        animationEventBroadcaster.OnAnimationEndEvent.AddListener(OnAnimationEnded);
+        //animationEventBroadcaster.OnAnimationEndEvent.AddListener(OnAnimationEnded);
+
     }
 
     public void OnClick(InputAction.CallbackContext context)
     {
-        // Debug.Log("click");
-
         if (GameManager.Instance.State != GameState.PlayerTurn || !context.performed)
             return;
 
@@ -41,20 +39,19 @@ public class MoveWall : MonoBehaviour
 
     public void TriggerAnimation()
     {
-        // Debug.Log("animacja");
-
         if (animator != null)
         {
+            SoundsManager.Instance.PlaySounds(Sounds.WallMove);
             animator.SetTrigger("Click");
         }
     }
 
-    public void OnAnimationEnded()
-    {
-        if(GameManager.Instance.State == GameState.PlayerTurn)
-        {
-            GetComponent<PlayerInput>().ActivateInput();
-            GameManager.Instance.UpdateState(GameState.Busy);
-        }
-    }
+    //public void OnAnimationEnded()
+    //{
+    //    if(GameManager.Instance.State == GameState.PlayerTurn)
+    //    {
+    //        GetComponent<PlayerInput>().ActivateInput();
+    //        GameManager.Instance.UpdateState(GameState.Busy);
+    //    }
+    //}
 }

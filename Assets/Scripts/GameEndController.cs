@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine.InputSystem;
 public class GameEndController : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI gameOverText;
@@ -27,6 +28,14 @@ public class GameEndController : MonoBehaviour
         }
     }
 
+    public void NextTurn()
+    {
+        if (GameManager.Instance.State != GameState.PlayerTurn)
+            return;
+
+        GameManager.Instance.UpdateState(GameState.Busy);
+    }
+
     public void NextLevelOrRepeat()
     {
         if (IsWin)
@@ -34,6 +43,7 @@ public class GameEndController : MonoBehaviour
             try
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+                SoundsManager.Instance.PlaySounds(Sounds.ButtonClick);
             }
             catch (System.Exception)
             {
@@ -52,6 +62,7 @@ public class GameEndController : MonoBehaviour
         try
         {
             SceneManager.LoadScene(LevelSelectionSceneIndex);
+            SoundsManager.Instance.PlaySounds(Sounds.ButtonClick);
         }
         catch (System.Exception)
         {

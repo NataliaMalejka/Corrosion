@@ -10,6 +10,7 @@ public class LevelSelector : MonoBehaviour
 
     public void LoadLevel(int level)
     {
+        SoundsManager.Instance.PlaySounds(Sounds.ButtonClick);
         SceneManager.LoadScene(level, LoadSceneMode.Single);
     }
 
